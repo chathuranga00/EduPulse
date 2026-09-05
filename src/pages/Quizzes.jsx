@@ -28,30 +28,190 @@ function quizKey(quiz) {
   return `${quiz.subject}::${quiz.title}`
 }
 
-// ── Sample quiz cards ────────────────────────────────────────────────────────
+// ── Quiz cards — full A/L subject coverage ───────────────────────────────────
 const BASE_QUIZZES = [
-  { id: 1,  title: 'Organic Chemistry — Reaction Mechanisms', subject: 'Chemistry',              questions: 20, duration: '30 min', difficulty: 'Hard'   },
-  { id: 2,  title: "Mechanics — Newton's Laws",               subject: 'Physics',                questions: 25, duration: '35 min', difficulty: 'Medium' },
-  { id: 3,  title: 'Cell Structure & Function',               subject: 'Biology',                questions: 18, duration: '25 min', difficulty: 'Medium' },
-  { id: 4,  title: 'Differentiation & Integration',           subject: 'Combined Mathematics',   questions: 22, duration: '35 min', difficulty: 'Hard'   },
-  { id: 5,  title: 'Plant Nutrition & Growth',                subject: 'Agricultural Science',   questions: 15, duration: '20 min', difficulty: 'Easy'   },
-  { id: 6,  title: 'Matrices & Determinants',                 subject: 'Higher Mathematics',     questions: 20, duration: '30 min', difficulty: 'Hard'   },
-  { id: 7,  title: 'Double Entry Bookkeeping',                subject: 'Accounting',             questions: 20, duration: '30 min', difficulty: 'Medium' },
-  { id: 8,  title: 'Marketing Concepts',                      subject: 'Business Studies',       questions: 15, duration: '20 min', difficulty: 'Easy'   },
-  { id: 9,  title: 'Supply & Demand Analysis',                subject: 'Economics',              questions: 18, duration: '25 min', difficulty: 'Medium' },
-  { id: 10, title: 'Index Numbers & Probability',             subject: 'Business Statistics',    questions: 15, duration: '25 min', difficulty: 'Hard'   },
-  { id: 11, title: 'Sri Lankan Political Institutions',       subject: 'Political Science',      questions: 15, duration: '20 min', difficulty: 'Medium' },
-  { id: 12, title: 'Ancient Sri Lankan History',              subject: 'History',                questions: 20, duration: '30 min', difficulty: 'Medium' },
-  { id: 13, title: 'Geomorphology Fundamentals',              subject: 'Geography',              questions: 18, duration: '25 min', difficulty: 'Easy'   },
-  { id: 14, title: 'Deductive & Inductive Reasoning',         subject: 'Logic and Scientific Method', questions: 15, duration: '20 min', difficulty: 'Medium' },
-  { id: 15, title: 'Electronics & Circuits',                  subject: 'Engineering Technology', questions: 20, duration: '30 min', difficulty: 'Hard'   },
-  { id: 16, title: 'Ecology & Biosystems',                    subject: 'Bio-Systems Technology', questions: 18, duration: '25 min', difficulty: 'Medium' },
-  { id: 17, title: 'Forces & Materials — SFT',                subject: 'Science for Technology', questions: 20, duration: '30 min', difficulty: 'Medium' },
-  { id: 18, title: 'English Grammar & Comprehension',         subject: 'English',                questions: 20, duration: '25 min', difficulty: 'Easy'   },
-  { id: 19, title: 'Sinhala Literature Appreciation',         subject: 'Sinhala',                questions: 15, duration: '20 min', difficulty: 'Medium' },
-  { id: 20, title: 'Buddhist Philosophy & Ethics',            subject: 'Buddhism',               questions: 15, duration: '20 min', difficulty: 'Easy'   },
-  { id: 21, title: 'GIT — Spreadsheets & Databases',          subject: 'General Information Technology', questions: 20, duration: '30 min', difficulty: 'Easy' },
-  { id: 22, title: 'Common General Test — Aptitude',          subject: 'Common General Test',    questions: 25, duration: '40 min', difficulty: 'Medium' },
+  // ── Science Stream ──────────────────────────────────────────────────────────
+  { id:  1, title: 'Organic Chemistry — Reaction Mechanisms',     subject: 'Chemistry',              questions: 20, duration: '30 min', difficulty: 'Hard'   },
+  { id:  2, title: 'Atomic Structure & Periodic Table',           subject: 'Chemistry',              questions: 20, duration: '30 min', difficulty: 'Medium' },
+  { id:  3, title: 'Electrochemistry & Redox Reactions',          subject: 'Chemistry',              questions: 15, duration: '20 min', difficulty: 'Easy'   },
+
+  { id:  4, title: "Mechanics — Newton's Laws",                   subject: 'Physics',                questions: 25, duration: '35 min', difficulty: 'Medium' },
+  { id:  5, title: 'Waves, Sound & Light',                        subject: 'Physics',                questions: 20, duration: '30 min', difficulty: 'Medium' },
+  { id:  6, title: 'Electricity & Magnetism',                     subject: 'Physics',                questions: 20, duration: '30 min', difficulty: 'Hard'   },
+
+  { id:  7, title: 'Cell Structure & Function',                   subject: 'Biology',                questions: 18, duration: '25 min', difficulty: 'Medium' },
+  { id:  8, title: 'Genetics & Heredity',                         subject: 'Biology',                questions: 20, duration: '30 min', difficulty: 'Hard'   },
+  { id:  9, title: 'Plant Biology & Photosynthesis',              subject: 'Biology',                questions: 15, duration: '20 min', difficulty: 'Easy'   },
+
+  { id: 10, title: 'Differentiation & Integration',               subject: 'Combined Mathematics',   questions: 22, duration: '35 min', difficulty: 'Hard'   },
+  { id: 11, title: 'Algebra & Functions',                         subject: 'Combined Mathematics',   questions: 20, duration: '30 min', difficulty: 'Medium' },
+  { id: 12, title: 'Coordinate Geometry & Vectors',               subject: 'Combined Mathematics',   questions: 18, duration: '25 min', difficulty: 'Hard'   },
+
+  { id: 13, title: 'Plant Nutrition & Growth',                    subject: 'Agricultural Science',   questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 14, title: 'Soil Science & Crop Management',              subject: 'Agricultural Science',   questions: 18, duration: '25 min', difficulty: 'Medium' },
+  { id: 15, title: 'Animal Husbandry & Farm Management',          subject: 'Agricultural Science',   questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 16, title: 'Matrices & Determinants',                     subject: 'Higher Mathematics',     questions: 20, duration: '30 min', difficulty: 'Hard'   },
+  { id: 17, title: 'Differential Equations',                      subject: 'Higher Mathematics',     questions: 18, duration: '25 min', difficulty: 'Hard'   },
+  { id: 18, title: 'Complex Numbers & Number Theory',             subject: 'Higher Mathematics',     questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  // ── Commerce Stream ──────────────────────────────────────────────────────────
+  { id: 19, title: 'Double Entry Bookkeeping',                    subject: 'Accounting',             questions: 20, duration: '30 min', difficulty: 'Medium' },
+  { id: 20, title: 'Financial Statements & Analysis',             subject: 'Accounting',             questions: 20, duration: '30 min', difficulty: 'Hard'   },
+  { id: 21, title: 'Cost Accounting Fundamentals',                subject: 'Accounting',             questions: 15, duration: '20 min', difficulty: 'Easy'   },
+
+  { id: 22, title: 'Marketing Concepts & Strategy',               subject: 'Business Studies',       questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 23, title: 'Management & Organisational Behaviour',       subject: 'Business Studies',       questions: 18, duration: '25 min', difficulty: 'Medium' },
+  { id: 24, title: 'Human Resource Management',                   subject: 'Business Studies',       questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 25, title: 'Supply & Demand Analysis',                    subject: 'Economics',              questions: 18, duration: '25 min', difficulty: 'Medium' },
+  { id: 26, title: 'Macroeconomics — GDP & Inflation',            subject: 'Economics',              questions: 20, duration: '30 min', difficulty: 'Hard'   },
+  { id: 27, title: 'Sri Lankan Economy & Development',            subject: 'Economics',              questions: 15, duration: '20 min', difficulty: 'Easy'   },
+
+  { id: 28, title: 'Index Numbers & Probability',                 subject: 'Business Statistics',    questions: 15, duration: '25 min', difficulty: 'Hard'   },
+  { id: 29, title: 'Sampling & Hypothesis Testing',               subject: 'Business Statistics',    questions: 18, duration: '25 min', difficulty: 'Hard'   },
+  { id: 30, title: 'Descriptive Statistics & Data Analysis',      subject: 'Business Statistics',    questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  // ── Arts & Social Sciences ───────────────────────────────────────────────────
+  { id: 31, title: 'Sri Lankan Political Institutions',           subject: 'Political Science',      questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 32, title: 'International Relations & Foreign Policy',    subject: 'Political Science',      questions: 18, duration: '25 min', difficulty: 'Hard'   },
+  { id: 33, title: 'Political Theories & Ideologies',             subject: 'Political Science',      questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 34, title: 'Ancient Sri Lankan History',                  subject: 'History',                questions: 20, duration: '30 min', difficulty: 'Medium' },
+  { id: 35, title: 'Modern World History — 20th Century',         subject: 'History',                questions: 20, duration: '30 min', difficulty: 'Medium' },
+  { id: 36, title: 'Indian & European History',                   subject: 'History',                questions: 18, duration: '25 min', difficulty: 'Hard'   },
+
+  { id: 37, title: 'Geomorphology & Landforms',                   subject: 'Geography',              questions: 18, duration: '25 min', difficulty: 'Easy'   },
+  { id: 38, title: 'Human Geography & Urbanization',              subject: 'Geography',              questions: 18, duration: '25 min', difficulty: 'Medium' },
+  { id: 39, title: 'Sri Lankan Geography & Resources',            subject: 'Geography',              questions: 15, duration: '20 min', difficulty: 'Easy'   },
+
+  { id: 40, title: 'Deductive & Inductive Reasoning',             subject: 'Logic and Scientific Method', questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 41, title: 'Scientific Method & Research Design',         subject: 'Logic and Scientific Method', questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 42, title: 'Fallacies & Argument Analysis',               subject: 'Logic and Scientific Method', questions: 15, duration: '20 min', difficulty: 'Hard'   },
+
+  { id: 43, title: 'Food Science & Nutrition',                    subject: 'Home Economics',         questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 44, title: 'Textile & Clothing Technology',               subject: 'Home Economics',         questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 45, title: 'Family Resource Management',                  subject: 'Home Economics',         questions: 15, duration: '20 min', difficulty: 'Easy'   },
+
+  { id: 46, title: 'Mass Communication Theories',                 subject: 'Communication & Media Studies', questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 47, title: 'Media Ethics & Press Freedom',                subject: 'Communication & Media Studies', questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 48, title: 'Digital Media & New Technologies',            subject: 'Communication & Media Studies', questions: 15, duration: '20 min', difficulty: 'Easy'   },
+
+  { id: 49, title: 'Greek & Roman Political Systems',             subject: 'Greek and Roman Civilization', questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 50, title: 'Art, Architecture & Culture of Greece & Rome', subject: 'Greek and Roman Civilization', questions: 15, duration: '20 min', difficulty: 'Easy' },
+  { id: 51, title: 'Philosophy of Socrates, Plato & Aristotle',   subject: 'Greek and Roman Civilization', questions: 15, duration: '20 min', difficulty: 'Hard'  },
+
+  // ── Technology Stream ────────────────────────────────────────────────────────
+  { id: 52, title: 'Forces & Materials — SFT',                    subject: 'Science for Technology', questions: 20, duration: '30 min', difficulty: 'Medium' },
+  { id: 53, title: 'Electricity for Technology',                  subject: 'Science for Technology', questions: 18, duration: '25 min', difficulty: 'Easy'   },
+  { id: 54, title: 'Chemical Processes in Industry',              subject: 'Science for Technology', questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 55, title: 'Electronics & Circuits',                      subject: 'Engineering Technology', questions: 20, duration: '30 min', difficulty: 'Hard'   },
+  { id: 56, title: 'Mechanical Engineering Principles',           subject: 'Engineering Technology', questions: 18, duration: '25 min', difficulty: 'Medium' },
+  { id: 57, title: 'Civil Engineering & Structures',              subject: 'Engineering Technology', questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 58, title: 'Ecology & Biosystems',                        subject: 'Bio-Systems Technology', questions: 18, duration: '25 min', difficulty: 'Medium' },
+  { id: 59, title: 'Biotechnology & Genetic Engineering',         subject: 'Bio-Systems Technology', questions: 18, duration: '25 min', difficulty: 'Hard'   },
+  { id: 60, title: 'Agriculture Biotechnology',                   subject: 'Bio-Systems Technology', questions: 15, duration: '20 min', difficulty: 'Easy'   },
+
+  // ── Languages ────────────────────────────────────────────────────────────────
+  { id: 61, title: 'Sinhala Literature Appreciation',             subject: 'Sinhala',   questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 62, title: 'Sinhala Grammar & Composition',               subject: 'Sinhala',   questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 63, title: 'Sinhala — Prose & Poetry Analysis',           subject: 'Sinhala',   questions: 15, duration: '20 min', difficulty: 'Hard'   },
+
+  { id: 64, title: 'Tamil Grammar & Writing',                     subject: 'Tamil',     questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 65, title: 'Tamil Literature & Prose',                    subject: 'Tamil',     questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 66, title: 'Tamil Poetry & Classical Texts',              subject: 'Tamil',     questions: 15, duration: '20 min', difficulty: 'Hard'   },
+
+  { id: 67, title: 'English Grammar & Comprehension',             subject: 'English',   questions: 20, duration: '25 min', difficulty: 'Easy'   },
+  { id: 68, title: 'English Essay & Writing Skills',              subject: 'English',   questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 69, title: 'English Literature — Poetry & Prose',         subject: 'English',   questions: 15, duration: '20 min', difficulty: 'Hard'   },
+
+  { id: 70, title: 'Pali — Grammar & Fundamentals',               subject: 'Pali',      questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 71, title: 'Pali — Buddhist Texts & Commentaries',        subject: 'Pali',      questions: 15, duration: '20 min', difficulty: 'Hard'   },
+
+  { id: 72, title: 'Sanskrit — Grammar Basics',                   subject: 'Sanskrit',  questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 73, title: 'Sanskrit — Classical Literature',             subject: 'Sanskrit',  questions: 15, duration: '20 min', difficulty: 'Hard'   },
+
+  { id: 74, title: 'Arabic — Language & Grammar',                 subject: 'Arabic',    questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 75, title: 'Arabic — Literature & Composition',           subject: 'Arabic',    questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 76, title: 'French — Grammar & Vocabulary',               subject: 'French',    questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 77, title: 'French — Reading & Comprehension',            subject: 'French',    questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 78, title: 'German — Grammar & Sentence Structure',       subject: 'German',    questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 79, title: 'German — Reading & Vocabulary',               subject: 'German',    questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 80, title: 'Russian — Alphabet & Grammar',                subject: 'Russian',   questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 81, title: 'Russian — Reading & Comprehension',           subject: 'Russian',   questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 82, title: 'Hindi — Grammar & Vocabulary',                subject: 'Hindi',     questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 83, title: 'Hindi — Literature & Composition',            subject: 'Hindi',     questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 84, title: 'Japanese — Hiragana, Katakana & Grammar',     subject: 'Japanese',  questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 85, title: 'Japanese — Reading & Writing',                subject: 'Japanese',  questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 86, title: 'Chinese — Tones, Characters & Grammar',       subject: 'Chinese',   questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 87, title: 'Chinese — Reading & Composition',             subject: 'Chinese',   questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 88, title: 'Korean — Hangul & Basic Grammar',             subject: 'Korean',    questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 89, title: 'Korean — Reading & Comprehension',            subject: 'Korean',    questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 90, title: 'Malay — Grammar & Vocabulary',                subject: 'Malay',     questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 91, title: 'Malay — Reading & Composition',               subject: 'Malay',     questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  // ── Religions & Civilizations ─────────────────────────────────────────────────
+  { id: 92,  title: 'Buddhist Philosophy & Ethics',                subject: 'Buddhism',               questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 93,  title: 'Theravada & Mahayana Buddhism',               subject: 'Buddhism',               questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 94,  title: 'Buddhist Meditation & Practice',              subject: 'Buddhism',               questions: 15, duration: '20 min', difficulty: 'Hard'   },
+
+  { id: 95,  title: 'Hindu Scriptures & Philosophy',               subject: 'Hinduism',               questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 96,  title: 'Hindu Practices, Rituals & Festivals',        subject: 'Hinduism',               questions: 15, duration: '20 min', difficulty: 'Easy'   },
+
+  { id: 97,  title: 'Pillars of Islam & Five Prayers',             subject: 'Islam',                  questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 98,  title: 'Islamic History & Jurisprudence',             subject: 'Islam',                  questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 99,  title: 'Christian Theology & Gospels',                subject: 'Christianity',           questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 100, title: 'Church History & Christian Ethics',           subject: 'Christianity',           questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 101, title: 'Buddhist Civilization — History & Culture',   subject: 'Buddhist Civilization',  questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 102, title: 'Buddhist Civilization — Art & Architecture',  subject: 'Buddhist Civilization',  questions: 15, duration: '20 min', difficulty: 'Easy'   },
+
+  { id: 103, title: 'Hindu Civilization — Culture & Society',      subject: 'Hindu Civilization',     questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 104, title: 'Hindu Civilization — Philosophy & Heritage',  subject: 'Hindu Civilization',     questions: 15, duration: '20 min', difficulty: 'Hard'   },
+
+  { id: 105, title: 'Islamic Civilization — Golden Age',           subject: 'Islam Civilization',     questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 106, title: 'Islamic Civilization — Science & Arts',       subject: 'Islam Civilization',     questions: 15, duration: '20 min', difficulty: 'Easy'   },
+
+  { id: 107, title: 'Christian Civilization — Medieval Europe',    subject: 'Christian Civilization', questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 108, title: 'Christian Civilization — Renaissance',        subject: 'Christian Civilization', questions: 15, duration: '20 min', difficulty: 'Hard'   },
+
+  // ── Aesthetic Subjects ────────────────────────────────────────────────────────
+  { id: 109, title: 'Dance History & Styles',                      subject: 'Dancing',        questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 110, title: 'Kandyan & Folk Dance Theory',                 subject: 'Dancing',        questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 111, title: 'Eastern Music — Ragas & Talas',               subject: 'Eastern Music',  questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 112, title: 'Eastern Music — History & Theory',            subject: 'Eastern Music',  questions: 15, duration: '20 min', difficulty: 'Easy'   },
+
+  { id: 113, title: 'Western Music — Theory & Notation',           subject: 'Western Music',  questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 114, title: 'Western Music — Composers & History',         subject: 'Western Music',  questions: 15, duration: '20 min', difficulty: 'Easy'   },
+
+  { id: 115, title: 'Carnatic Music — Swaras & Ragas',             subject: 'Carnatic Music', questions: 15, duration: '20 min', difficulty: 'Medium' },
+  { id: 116, title: 'Carnatic Music — Compositions & History',     subject: 'Carnatic Music', questions: 15, duration: '20 min', difficulty: 'Hard'   },
+
+  { id: 117, title: 'Drama Theory & Stagecraft',                   subject: 'Drama and Theater', questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 118, title: 'Sri Lankan & World Drama History',            subject: 'Drama and Theater', questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  { id: 119, title: 'Visual Art — Elements & Principles',          subject: 'Art',            questions: 15, duration: '20 min', difficulty: 'Easy'   },
+  { id: 120, title: 'Sri Lankan & World Art History',              subject: 'Art',            questions: 15, duration: '20 min', difficulty: 'Medium' },
+
+  // ── Common Modules ────────────────────────────────────────────────────────────
+  { id: 121, title: 'General English — Grammar & Writing',         subject: 'General English',                  questions: 20, duration: '25 min', difficulty: 'Easy'   },
+  { id: 122, title: 'General English — Reading & Comprehension',   subject: 'General English',                  questions: 20, duration: '25 min', difficulty: 'Medium' },
+  { id: 123, title: 'Common General Test — Aptitude',              subject: 'Common General Test',              questions: 25, duration: '40 min', difficulty: 'Medium' },
+  { id: 124, title: 'Common General Test — Logical Reasoning',     subject: 'Common General Test',              questions: 25, duration: '35 min', difficulty: 'Hard'   },
+  { id: 125, title: 'GIT — Spreadsheets & Databases',              subject: 'General Information Technology',   questions: 20, duration: '30 min', difficulty: 'Easy'   },
+  { id: 126, title: 'GIT — Internet, Networks & Security',         subject: 'General Information Technology',   questions: 20, duration: '30 min', difficulty: 'Medium' },
 ]
 
 // ── Styling helpers ──────────────────────────────────────────────────────────
