@@ -1,11 +1,13 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { supabase } from '../lib/supabase.js'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser]         = useState(null)
   const [settings, setSettings] = useState(null)
-  const [loading, setLoading]   = useState(true) // true until /me resolves
+  const [loading, setLoading]   = useState(true)
+  const channelRef              = useRef(null)
 
   // ── Fetch current session on mount ────────────────────────────────────────
   useEffect(() => {
@@ -18,17 +20,44 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false))
   }, [])
 
+  // ── Real-time: sync user profile & settings across tabs/devices ──────────
+  useEffect(() => {
+    if (!user?.id) return
+
+    // Clean up previous channel
+    if (channelRef.current) supabase.removeChannel(channelRef.current)
+
+    const ch = supabase
+      .channel(`auth-user-${user.id}`)
+      .on('postgres_changes', {
+        event: 'UPDATE', schema: 'public', table: 'users',
+        filter: `id=eq.${user.id}`,
+      }, (payload) => {
+        // strip password before setting
+        const { password: _pw, ...safeUser } = payload.new
+        setUser(safeUser)
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE', schema: 'public', table: 'user_settings',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        setSettings(payload.new)
+      })
+      .subscribe()
+
+    channelRef.current = ch
+    return () => supabase.removeChannel(ch)
+  }, [user?.id])
+
   // ── Actions ───────────────────────────────────────────────────────────────
   const login = useCallback(async (email, password) => {
     const res  = await fetch('/api/auth/login', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ email, password }),
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Login failed')
     setUser(data.user)
-    // fetch settings after login
     const sr = await fetch('/api/auth/me')
     if (sr.ok) { const sd = await sr.json(); setSettings(sd.settings) }
     return data.user
@@ -36,9 +65,8 @@ export function AuthProvider({ children }) {
 
   const register = useCallback(async (name, email, password) => {
     const res  = await fetch('/api/auth/register', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ name, email, password }),
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password }),
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Registration failed')
@@ -49,6 +77,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const logout = useCallback(async () => {
+    if (channelRef.current) supabase.removeChannel(channelRef.current)
     await fetch('/api/auth/logout', { method: 'POST' })
     setUser(null)
     setSettings(null)
@@ -56,9 +85,8 @@ export function AuthProvider({ children }) {
 
   const updateProfile = useCallback(async (fields) => {
     const res  = await fetch('/api/users/profile', {
-      method:  'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(fields),
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fields),
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Failed to update profile')
@@ -68,9 +96,8 @@ export function AuthProvider({ children }) {
 
   const changePassword = useCallback(async (currentPassword, newPassword) => {
     const res  = await fetch('/api/users/password', {
-      method:  'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ currentPassword, newPassword }),
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ currentPassword, newPassword }),
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Failed to change password')
@@ -78,9 +105,8 @@ export function AuthProvider({ children }) {
 
   const updateSettings = useCallback(async (newSettings) => {
     const res  = await fetch('/api/users/settings', {
-      method:  'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(newSettings),
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newSettings),
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Failed to update settings')
@@ -88,13 +114,16 @@ export function AuthProvider({ children }) {
     return data.settings
   }, [])
 
-  // user initials for avatar
   const initials = user?.name
     ? user.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
     : '?'
 
   return (
-    <AuthContext.Provider value={{ user, settings, loading, initials, login, register, logout, updateProfile, changePassword, updateSettings }}>
+    <AuthContext.Provider value={{
+      user, settings, loading, initials,
+      login, register, logout,
+      updateProfile, changePassword, updateSettings,
+    }}>
       {children}
     </AuthContext.Provider>
   )

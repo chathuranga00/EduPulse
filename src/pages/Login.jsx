@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Sparkles, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useTheme } from '../context/ThemeContext.jsx'
+import logo from '../assets/logo.png'
 
 export default function Login() {
   const { login }         = useAuth()
@@ -36,8 +37,8 @@ export default function Login() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-indigo-200/50 dark:shadow-none">
-            <Sparkles className="h-7 w-7" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl overflow-hidden shadow-lg shadow-indigo-200/50 dark:shadow-none">
+            <img src={logo} alt="EduPulse AI" className="h-full w-full object-cover" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">EduPulse AI</h1>

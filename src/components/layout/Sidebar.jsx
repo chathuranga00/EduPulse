@@ -1,9 +1,10 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, MessageSquare, FileText, CalendarDays,
-  ClipboardList, Users, Settings, HelpCircle, Sparkles,
+  ClipboardList, Users, Settings, HelpCircle,
   X, LogOut,
 } from 'lucide-react'
+import logo from '../../assets/logo.png'
 import { useAuth } from '../../context/AuthContext.jsx'
 
 const navItems = [
@@ -35,8 +36,8 @@ export default function Sidebar({ open, onClose }) {
         {/* Logo */}
         <div className="mb-8 flex items-start justify-between px-2">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white shadow-md shadow-indigo-200/50 transition-transform duration-200 hover:scale-105 dark:shadow-none">
-              <Sparkles className="h-5 w-5" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden shadow-md shadow-indigo-200/50 transition-transform duration-200 hover:scale-105 dark:shadow-none">
+              <img src={logo} alt="EduPulse AI" className="h-full w-full object-cover" />
             </div>
             <div>
               <h1 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">EduPulse AI</h1>
