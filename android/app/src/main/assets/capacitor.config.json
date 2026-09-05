@@ -1,0 +1,20 @@
+{
+	"appId": "com.edupulseai.app",
+	"appName": "EduPulseAI",
+	"webDir": "dist",
+	"android": {
+		"allowMixedContent": true,
+		"backgroundColor": "#ffffff"
+	},
+	"plugins": {
+		"CapacitorHttp": {
+			"enabled": true
+		},
+		"SplashScreen": {
+			"launchShowDuration": 2000,
+			"backgroundColor": "#7c3aed",
+			"androidSplashResourceName": "splash",
+			"showSpinner": false
+		}
+	}
+}
