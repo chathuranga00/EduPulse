@@ -1,0 +1,89 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-lavender: #f5f3ff;
+  --color-lavender-light: #faf9ff;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply m-0 bg-lavender-light text-gray-800 transition-colors duration-300;
+  }
+
+  html.dark body {
+    @apply bg-gray-950 text-gray-100;
+  }
+}
+
+@layer components {
+  .ep-page {
+    @apply space-y-6;
+  }
+
+  .ep-card {
+    @apply rounded-2xl border border-indigo-50 bg-white shadow-sm shadow-indigo-100/50 transition-all duration-200 ease-out hover:border-indigo-100/80 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:shadow-none dark:hover:border-gray-700;
+  }
+
+  .ep-card-static {
+    @apply rounded-2xl border border-indigo-50 bg-white shadow-sm shadow-indigo-100/50 dark:border-gray-800 dark:bg-gray-900 dark:shadow-none;
+  }
+
+  .ep-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200/50 transition-all duration-200 hover:bg-primary-hover hover:shadow-lg active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 dark:shadow-none;
+  }
+
+  .ep-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-indigo-100 bg-lavender px-4 py-2.5 text-sm font-semibold text-primary transition-all duration-200 hover:border-primary/30 hover:bg-indigo-50 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700;
+  }
+
+  .ep-btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-lavender hover:text-primary dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white;
+  }
+
+  .ep-input {
+    @apply w-full rounded-2xl border border-gray-200 bg-lavender-light px-4 py-2.5 text-sm text-gray-800 transition-colors duration-200 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500;
+  }
+
+  .ep-pill {
+    @apply inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white px-4 py-2 text-sm font-semibold text-primary shadow-sm shadow-indigo-100/50 transition-all duration-200 hover:border-primary hover:bg-lavender dark:border-gray-700 dark:bg-gray-900 dark:shadow-none;
+  }
+}
+
+@keyframes ep-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes ep-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ep-toast-enter {
+  animation: ep-slide-in 0.25s ease-out;
+}
+
+.ep-fade-in {
+  animation: ep-fade-in 0.2s ease-out;
+}
