@@ -33,6 +33,11 @@ function readJsonBody(req) {
 function sendJson(res, statusCode, payload) {
   res.statusCode = statusCode
   res.setHeader('Content-Type', 'application/json')
+  // Allow requests from Capacitor/Android WebView and local dev
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie')
+  res.setHeader('Access-Control-Allow-Credentials', 'true')
   res.end(JSON.stringify(payload))
 }
 
@@ -42,6 +47,17 @@ function apiRoutesPlugin() {
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const url = req.url?.split('?')[0]
+
+        // Handle CORS preflight requests from Android WebView
+        if (req.method === 'OPTIONS') {
+          res.statusCode = 204
+          res.setHeader('Access-Control-Allow-Origin', '*')
+          res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+          res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie')
+          res.setHeader('Access-Control-Allow-Credentials', 'true')
+          res.end()
+          return
+        }
 
         // ── AI Tutor ──────────────────────────────────────────────────────────
         if (req.method === 'POST' && url === '/api/tutor') {
@@ -195,13 +211,27 @@ function apiRoutesPlugin() {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  process.env.NVIDIA_API_KEY      = env.NVIDIA_API_KEY
-  process.env.NVIDIA_MODEL        = env.NVIDIA_MODEL
-  process.env.JWT_SECRET          = env.JWT_SECRET
-  process.env.SUPABASE_URL        = env.SUPABASE_URL
+
+  // Populate process.env immediately so server-side modules (db.js, auth.js, etc.)
+  // can read them when they first import — before any request is made
+  process.env.NVIDIA_API_KEY       = env.NVIDIA_API_KEY
+  process.env.NVIDIA_MODEL         = env.NVIDIA_MODEL
+  process.env.JWT_SECRET           = env.JWT_SECRET
+  process.env.SUPABASE_URL         = env.SUPABASE_URL
   process.env.SUPABASE_SERVICE_KEY = env.SUPABASE_SERVICE_KEY
 
   return {
     plugins: [react(), tailwindcss(), apiRoutesPlugin()],
+    server: {
+      host: '0.0.0.0',  // Listen on all interfaces so Android emulator can connect
+      port: 5173,
+    },
+    build: {
+      outDir: 'dist',
+      // CRITICAL for Capacitor/Android: use relative asset paths, not absolute '/'
+      // Without this, Android WebView can't load JS/CSS from the bundle
+      assetsDir: 'assets',
+    },
+    base: './',
   }
 })

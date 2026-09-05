@@ -7,10 +7,16 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:android": "vite build && npx cap sync android",
+    "open:android": "npx cap open android"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.107.0",
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/cli": "^8.5.1",
+    "@capacitor/core": "^8.5.1",
+    "@capacitor/splash-screen": "^8.0.2",
     "@supabase/supabase-js": "^2.115.0",
     "@tailwindcss/vite": "^4.3.2",
     "bcryptjs": "^3.0.3",
@@ -36,6 +42,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.6.0",
+    "typescript": "^7.0.2",
     "vite": "^8.1.0"
   }
 }

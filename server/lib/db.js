@@ -1,25 +1,24 @@
 import { createClient } from '@supabase/supabase-js'
 import dotenv from 'dotenv'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
 
-if (!process.env.SUPABASE_URL) dotenv.config()
-
-let _client = null
+const __dirname = dirname(fileURLToPath(import.meta.url))
+dotenv.config({ path: join(__dirname, '../../.env') })
 
 export function getDb() {
-  if (!_client) {
-    const url = process.env.SUPABASE_URL
-    const key = process.env.SUPABASE_SERVICE_KEY
+  const url = process.env.SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_KEY
 
-    if (!url || !key) {
-      throw new Error(
-        'SUPABASE_URL and SUPABASE_SERVICE_KEY must be set in your .env file.\n' +
-        'Get them from: Supabase Dashboard → Settings → API',
-      )
-    }
-
-    _client = createClient(url, key, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    })
+  if (!url || !key || !url.startsWith('http')) {
+    throw new Error(
+      'SUPABASE_URL and SUPABASE_SERVICE_KEY must be set in your .env file.\n' +
+      'Get them from: Supabase Dashboard → Settings → API',
+    )
   }
-  return _client
+
+  // Create a fresh client every call — avoids stale env var issues during dev
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  })
 }

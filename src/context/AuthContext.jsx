@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase.js'
+import { API_BASE } from '../lib/api.js'
 
 const AuthContext = createContext(null)
 
@@ -11,7 +12,7 @@ export function AuthProvider({ children }) {
 
   // ── Fetch current session on mount ────────────────────────────────────────
   useEffect(() => {
-    fetch('/api/auth/me')
+    fetch(API_BASE + '/api/auth/me')
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data) { setUser(data.user); setSettings(data.settings) }
@@ -51,40 +52,40 @@ export function AuthProvider({ children }) {
 
   // ── Actions ───────────────────────────────────────────────────────────────
   const login = useCallback(async (email, password) => {
-    const res  = await fetch('/api/auth/login', {
+    const res  = await fetch(API_BASE + '/api/auth/login', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Login failed')
     setUser(data.user)
-    const sr = await fetch('/api/auth/me')
+    const sr = await fetch(API_BASE + '/api/auth/me')
     if (sr.ok) { const sd = await sr.json(); setSettings(sd.settings) }
     return data.user
   }, [])
 
   const register = useCallback(async (name, email, password) => {
-    const res  = await fetch('/api/auth/register', {
+    const res  = await fetch(API_BASE + '/api/auth/register', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password }),
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Registration failed')
     setUser(data.user)
-    const sr = await fetch('/api/auth/me')
+    const sr = await fetch(API_BASE + '/api/auth/me')
     if (sr.ok) { const sd = await sr.json(); setSettings(sd.settings) }
     return data.user
   }, [])
 
   const logout = useCallback(async () => {
     if (channelRef.current) supabase.removeChannel(channelRef.current)
-    await fetch('/api/auth/logout', { method: 'POST' })
+    await fetch(API_BASE + '/api/auth/logout', { method: 'POST' })
     setUser(null)
     setSettings(null)
   }, [])
 
   const updateProfile = useCallback(async (fields) => {
-    const res  = await fetch('/api/users/profile', {
+    const res  = await fetch(API_BASE + '/api/users/profile', {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(fields),
     })
@@ -95,7 +96,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const changePassword = useCallback(async (currentPassword, newPassword) => {
-    const res  = await fetch('/api/users/password', {
+    const res  = await fetch(API_BASE + '/api/users/password', {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ currentPassword, newPassword }),
     })
@@ -104,7 +105,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const updateSettings = useCallback(async (newSettings) => {
-    const res  = await fetch('/api/users/settings', {
+    const res  = await fetch(API_BASE + '/api/users/settings', {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newSettings),
     })

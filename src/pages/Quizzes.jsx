@@ -29,7 +29,7 @@ function quizKey(quiz) {
 }
 
 // ── Quiz cards — full A/L subject coverage ───────────────────────────────────
-const BASE_QUIZZES = [
+export const BASE_QUIZZES = [
   // ── Science Stream ──────────────────────────────────────────────────────────
   { id:  1, title: 'Organic Chemistry — Reaction Mechanisms',     subject: 'Chemistry',              questions: 20, duration: '30 min', difficulty: 'Hard'   },
   { id:  2, title: 'Atomic Structure & Periodic Table',           subject: 'Chemistry',              questions: 20, duration: '30 min', difficulty: 'Medium' },

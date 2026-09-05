@@ -13,6 +13,11 @@ dist-ssr
 *.local
 .env
 .env.local
+.env.production
+
+# Android/Capacitor generated files (keep capacitor.config.ts but not the android project secrets)
+android/
+ios/
 
 # Editor directories and files
 .vscode/*

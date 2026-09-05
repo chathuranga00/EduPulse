@@ -1,17 +1,43 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Search, Bell, Moon, Sun, Sparkles, Menu, Settings, LogOut } from 'lucide-react'
+import { Search, Bell, Moon, Sun, Menu, Settings, LogOut, BookOpen, Users, X } from 'lucide-react'
 import { useTheme } from '../../context/ThemeContext.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
+import { supabase } from '../../lib/supabase.js'
+import { BASE_QUIZZES } from '../../pages/Quizzes.jsx'
 import logo from '../../assets/logo.png'
 
+// ── Search result item ────────────────────────────────────────────────────────
+function ResultItem({ icon, label, sub, onClick }) {
+  return (
+    <button type="button" onClick={onClick}
+      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-lavender dark:hover:bg-gray-800">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-primary dark:bg-gray-800">
+        {icon}
+      </span>
+      <div className="min-w-0">
+        <p className="truncate text-sm font-medium text-gray-900 dark:text-white">{label}</p>
+        {sub && <p className="truncate text-xs text-gray-500 dark:text-gray-400">{sub}</p>}
+      </div>
+    </button>
+  )
+}
+
+// ── Main Header ───────────────────────────────────────────────────────────────
 export default function Header({ onMenuClick }) {
   const { darkMode, toggleDarkMode }    = useTheme()
   const { user, initials, logout }      = useAuth()
   const navigate                        = useNavigate()
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const dropRef = useRef(null)
+  const [query, setQuery]               = useState('')
+  const [results, setResults]           = useState([])
+  const [searching, setSearching]       = useState(false)
+  const [showResults, setShowResults]   = useState(false)
+  const dropRef   = useRef(null)
+  const searchRef = useRef(null)
+  const timerRef  = useRef(null)
 
+  // Close user dropdown on outside click
   useEffect(() => {
     const handler = (e) => {
       if (dropRef.current && !dropRef.current.contains(e.target)) setDropdownOpen(false)
@@ -20,10 +46,80 @@ export default function Header({ onMenuClick }) {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
+  // Close search results on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) setShowResults(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  // Real-time search with debounce
+  const doSearch = useCallback(async (q) => {
+    if (!q.trim()) { setResults([]); setSearching(false); return }
+    setSearching(true)
+    try {
+      const term = q.trim().toLowerCase()
+
+      // Search community posts from Supabase (real-time)
+      const { data: posts } = await supabase
+        .from('posts')
+        .select('id, content, course, author_name')
+        .or(`content.ilike.%${term}%,course.ilike.%${term}%,author_name.ilike.%${term}%`)
+        .limit(4)
+
+      // Search quizzes from static list
+      const quizResults = BASE_QUIZZES.filter((q) =>
+        q.title?.toLowerCase().includes(term) ||
+        q.subject?.toLowerCase().includes(term)
+      ).slice(0, 3)
+
+      const combined = [
+        ...quizResults.map((q) => ({
+          type: 'quiz', id: q.id, label: q.title, sub: `${q.subject} · ${q.difficulty}`,
+        })),
+        ...(posts || []).map((p) => ({
+          type: 'post', id: p.id,
+          label: p.content?.substring(0, 60) + (p.content?.length > 60 ? '…' : ''),
+          sub: `${p.author_name} · ${p.course}`,
+        })),
+      ]
+
+      setResults(combined)
+    } catch {
+      setResults([])
+    } finally {
+      setSearching(false)
+    }
+  }, [])
+
+  const handleQueryChange = (e) => {
+    const val = e.target.value
+    setQuery(val)
+    setShowResults(true)
+    clearTimeout(timerRef.current)
+    if (!val.trim()) { setResults([]); return }
+    // Debounce 300ms
+    timerRef.current = setTimeout(() => doSearch(val), 300)
+  }
+
+  const clearSearch = () => {
+    setQuery('')
+    setResults([])
+    setShowResults(false)
+  }
+
   const handleLogout = async () => {
     setDropdownOpen(false)
     await logout()
     navigate('/login', { replace: true })
+  }
+
+  const handleResultClick = (result) => {
+    clearSearch()
+    if (result.type === 'quiz') navigate('/quizzes')
+    else if (result.type === 'post') navigate('/community')
   }
 
   return (
@@ -34,15 +130,61 @@ export default function Header({ onMenuClick }) {
         <Menu className="h-5 w-5" />
       </button>
 
-      <div className="relative min-w-0 flex-1 sm:max-w-md">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-        <input type="search" placeholder="Search courses, notes..." className="ep-input py-2 pl-10 pr-4 sm:py-2.5" />
-      </div>
+      {/* ── Search bar ── */}
+      <div className="relative min-w-0 flex-1 sm:max-w-md" ref={searchRef}>
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" />
+        <input
+          type="search"
+          value={query}
+          onChange={handleQueryChange}
+          onFocus={() => query && setShowResults(true)}
+          placeholder="Search quizzes, posts..."
+          className="ep-input py-2 pl-10 pr-8 sm:py-2.5"
+          autoComplete="off"
+        />
+        {query && (
+          <button type="button" onClick={clearSearch}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <X className="h-4 w-4" />
+          </button>
+        )}
 
-      <nav className="hidden items-center gap-6 md:flex">
-        <a href="#library" className="ep-btn-ghost px-0 py-0 hover:bg-transparent">My Library</a>
-        <a href="#classes" className="ep-btn-ghost px-0 py-0 hover:bg-transparent">Live Classes</a>
-      </nav>
+        {/* Results dropdown */}
+        {showResults && query && (
+          <div className="absolute left-0 right-0 top-12 z-50 rounded-2xl border border-gray-100 bg-white p-2 shadow-xl dark:border-gray-800 dark:bg-gray-900">
+            {searching && (
+              <p className="px-3 py-4 text-center text-sm text-gray-500 dark:text-gray-400">Searching…</p>
+            )}
+            {!searching && results.length === 0 && (
+              <p className="px-3 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                No results for <span className="font-medium">"{query}"</span>
+              </p>
+            )}
+            {!searching && results.length > 0 && (
+              <>
+                {results.filter(r => r.type === 'quiz').length > 0 && (
+                  <>
+                    <p className="px-3 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Quizzes</p>
+                    {results.filter(r => r.type === 'quiz').map(r => (
+                      <ResultItem key={r.id} icon={<BookOpen className="h-4 w-4" />}
+                        label={r.label} sub={r.sub} onClick={() => handleResultClick(r)} />
+                    ))}
+                  </>
+                )}
+                {results.filter(r => r.type === 'post').length > 0 && (
+                  <>
+                    <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Community</p>
+                    {results.filter(r => r.type === 'post').map(r => (
+                      <ResultItem key={r.id} icon={<Users className="h-4 w-4" />}
+                        label={r.label} sub={r.sub} onClick={() => handleResultClick(r)} />
+                    ))}
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
 
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         {/* Ask AI button — desktop */}
