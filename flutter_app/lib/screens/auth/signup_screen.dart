@@ -1,8 +1,9 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../providers/lang_provider.dart';
 import '../main_shell.dart';
 import 'login_screen.dart';
 
@@ -30,7 +31,7 @@ class _SignupScreenState extends State<SignupScreen> {
         _name.text.trim(), _email.text.trim(), _pass.text);
       if (mounted) {
         Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => const MainShell()));
+          context, MaterialPageRoute(builder: (_) => MainShell()));
       }
     } catch (e) {
       setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
@@ -173,7 +174,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   const SizedBox(height: 10),
                   GestureDetector(
                     onTap: () => context.read<ThemeProvider>().toggle(),
-                    child: Text(dark ? '☀️ Light mode' : '🌙 Dark mode',
+                    child: Text(dark ? '?? Light mode' : '?? Dark mode',
                         style: TextStyle(
                             color: Colors.grey.shade400, fontSize: 12)),
                   ),

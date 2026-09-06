@@ -15,10 +15,10 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _email = TextEditingController();
-  final _pass  = TextEditingController();
-  bool _loading = false;
-  bool _show = false;
+  final _email   = TextEditingController();
+  final _pass    = TextEditingController();
+  bool _loading  = false;
+  bool _show     = false;
   String? _error;
 
   Future<void> _submit() async {
@@ -41,7 +41,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final dark = context.watch<ThemeProvider>().isDark;
-    final s    = context.watch<LangProvider>().strings;
+    final lang = context.watch<LangProvider>();
+    final s    = lang.strings;
+
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -51,6 +53,20 @@ class _LoginScreenState extends State<LoginScreen> {
               constraints: const BoxConstraints(maxWidth: 400),
               child: Column(
                 children: [
+                  // ── Language selector — 3 buttons ──────────────────────
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _LangBtn(code: 'en', label: 'ENG', current: lang.locale),
+                      const SizedBox(width: 8),
+                      _LangBtn(code: 'si', label: 'සිං', current: lang.locale),
+                      const SizedBox(width: 8),
+                      _LangBtn(code: 'ta', label: 'தமி', current: lang.locale),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ── Logo ────────────────────────────────────────────────
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Image.asset('assets/images/logo.png',
@@ -66,6 +82,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(s.signIn,
                       style: TextStyle(color: Colors.grey.shade500)),
                   const SizedBox(height: 28),
+
+                  // ── Form ────────────────────────────────────────────────
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(20),
@@ -80,18 +98,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.red.shade50,
                                   borderRadius: BorderRadius.circular(10),
-                                  border:
-                                      Border.all(color: Colors.red.shade200),
+                                  border: Border.all(color: Colors.red.shade200),
                                 ),
                                 child: Row(children: [
-                                  const Icon(Icons.error_outline,
-                                      color: Colors.red, size: 16),
+                                  const Icon(Icons.error_outline, color: Colors.red, size: 16),
                                   const SizedBox(width: 8),
-                                  Expanded(
-                                      child: Text(_error!,
-                                          style: const TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 13))),
+                                  Expanded(child: Text(_error!,
+                                      style: const TextStyle(color: Colors.red, fontSize: 13))),
                                 ]),
                               ),
                               const SizedBox(height: 12),
@@ -124,7 +137,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               onPressed: _loading ? null : _submit,
                               child: _loading
                                   ? const SizedBox(width: 18, height: 18,
-                                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2, color: Colors.white))
                                   : Text(s.signIn),
                             ),
                           ],
@@ -133,28 +147,64 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+
+                  // ── Sign up link ────────────────────────────────────────
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Text("Don't have an account? ",
-                        style: TextStyle(color: Colors.grey.shade600)),
+                    Text(s.noAccount,
+                        style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
                     GestureDetector(
                       onTap: () => Navigator.pushReplacement(context,
-                          MaterialPageRoute(
-                              builder: (_) => const SignupScreen())),
-                      child: const Text('Create one',
-                          style: TextStyle(
-                              color: kPrimary, fontWeight: FontWeight.w600)),
+                          MaterialPageRoute(builder: (_) => const SignupScreen())),
+                      child: Text(s.createOne,
+                          style: const TextStyle(
+                              color: kPrimary, fontWeight: FontWeight.w600, fontSize: 13)),
                     ),
                   ]),
                   const SizedBox(height: 10),
+
+                  // ── Dark mode toggle ─────────────────────────────────────
                   GestureDetector(
                     onTap: () => context.read<ThemeProvider>().toggle(),
-                    child: Text(dark ? '?? Light mode' : '?? Dark mode',
-                        style: TextStyle(
-                            color: Colors.grey.shade400, fontSize: 12)),
+                    child: Text(dark ? '☀️ Light mode' : '🌙 Dark mode',
+                        style: TextStyle(color: Colors.grey.shade400, fontSize: 12)),
                   ),
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Language button ───────────────────────────────────────────────────────────
+class _LangBtn extends StatelessWidget {
+  final String code, label, current;
+  const _LangBtn({required this.code, required this.label, required this.current});
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = current == code;
+    return GestureDetector(
+      onTap: () => context.read<LangProvider>().setLocale(code),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? kPrimary : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selected ? kPrimary : Colors.grey.shade400,
+            width: selected ? 2 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+            color: selected ? Colors.white : Colors.grey.shade600,
           ),
         ),
       ),
