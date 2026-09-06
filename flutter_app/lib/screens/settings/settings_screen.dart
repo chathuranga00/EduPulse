@@ -1,10 +1,12 @@
-﻿import "package:flutter/material.dart";
-import "package:provider/provider.dart";
-import "../../core/api_service.dart";
-import "../../core/theme.dart";
-import "../../providers/auth_provider.dart";
-import "../../providers/theme_provider.dart";
-import "../auth/login_screen.dart";
+﻿import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/api_service.dart';
+import '../../core/theme.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/theme_provider.dart';
+import '../../providers/lang_provider.dart';
+import '../../l10n/app_strings.dart';
+import '../auth/login_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -40,6 +42,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const LoginScreen()), (_) => false);
   }
 
+  Widget _langTile(BuildContext context, String code, String label) {
+    final lang = context.watch<LangProvider>();
+    final selected = lang.locale == code;
+    return ListTile(
+      title: Text(label, style: const TextStyle(fontSize: 14)),
+      trailing: selected
+          ? const Icon(Icons.check_circle, color: kPrimary)
+          : const Icon(Icons.circle_outlined, color: Colors.grey),
+      onTap: () => context.read<LangProvider>().setLocale(code),
+      dense: true,
+    );
+  }
+
   void _changePassword() {
     final curr = TextEditingController(), next = TextEditingController();
     bool saving = false;
@@ -71,7 +86,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final user  = context.watch<AuthProvider>().user;
     final theme = context.watch<ThemeProvider>();
     return Scaffold(
-      appBar: AppBar(title: const Text("Settings", style: TextStyle(fontWeight: FontWeight.bold))),
+      appBar: AppBar(
+        title: Row(children: [
+          ClipRRect(borderRadius: BorderRadius.circular(8),
+            child: Image.asset('assets/images/logo.png', width: 28, height: 28, fit: BoxFit.cover)),
+          const SizedBox(width: 8),
+          const Text('Settings', style: TextStyle(fontWeight: FontWeight.bold)),
+        ]),
+      ),
       body: ListView(padding: const EdgeInsets.all(16), children: [
         // Profile card
         Card(child: Padding(padding: const EdgeInsets.all(16), child: Row(children: [
@@ -112,6 +134,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: const Text("Dark Mode"),
           secondary: Icon(theme.isDark ? Icons.dark_mode : Icons.light_mode_outlined, color: kPrimary),
           value: theme.isDark, onChanged: (_) => theme.toggle(), activeColor: kPrimary)),
+        const SizedBox(height: 18),
+
+        // Language
+        Text("Language / භාෂාව / மொழி",
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 10),
+        Card(child: Column(children: [
+          _langTile(context, 'en', '🇬🇧  English'),
+          const Divider(height: 1, indent: 56),
+          _langTile(context, 'si', '🇱🇰  සිංහල'),
+          const Divider(height: 1, indent: 56),
+          _langTile(context, 'ta', '🇱🇰  தமிழ்'),
+        ])),
         const SizedBox(height: 18),
 
         // Security

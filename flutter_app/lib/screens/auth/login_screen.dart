@@ -1,8 +1,9 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../providers/lang_provider.dart';
 import '../main_shell.dart';
 import 'signup_screen.dart';
 
@@ -28,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
           _email.text.trim(), _pass.text);
       if (mounted) {
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => const MainShell()));
+            context, MaterialPageRoute(builder: (_) => MainShell()));
       }
     } catch (e) {
       setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
@@ -40,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final dark = context.watch<ThemeProvider>().isDark;
+    final s    = context.watch<LangProvider>().strings;
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -61,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           .headlineSmall
                           ?.copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
-                  Text('Sign in to your account',
+                  Text(s.signIn,
                       style: TextStyle(color: Colors.grey.shade500)),
                   const SizedBox(height: 28),
                   Card(
@@ -97,42 +99,33 @@ class _LoginScreenState extends State<LoginScreen> {
                             TextFormField(
                               controller: _email,
                               keyboardType: TextInputType.emailAddress,
-                              decoration: const InputDecoration(
-                                  labelText: 'Email address',
-                                  prefixIcon: Icon(Icons.email_outlined)),
-                              validator: (v) =>
-                                  v!.isEmpty ? 'Required' : null,
+                              decoration: InputDecoration(
+                                  labelText: s.email,
+                                  prefixIcon: const Icon(Icons.email_outlined)),
+                              validator: (v) => v!.isEmpty ? s.required : null,
                             ),
                             const SizedBox(height: 12),
                             TextFormField(
                               controller: _pass,
                               obscureText: !_show,
                               decoration: InputDecoration(
-                                labelText: 'Password',
+                                labelText: s.password,
                                 prefixIcon: const Icon(Icons.lock_outline),
                                 suffixIcon: IconButton(
-                                  icon: Icon(_show
-                                      ? Icons.visibility_off
-                                      : Icons.visibility),
-                                  onPressed: () =>
-                                      setState(() => _show = !_show),
+                                  icon: Icon(_show ? Icons.visibility_off : Icons.visibility),
+                                  onPressed: () => setState(() => _show = !_show),
                                 ),
                               ),
-                              validator: (v) =>
-                                  v!.isEmpty ? 'Required' : null,
+                              validator: (v) => v!.isEmpty ? s.required : null,
                               onFieldSubmitted: (_) => _submit(),
                             ),
                             const SizedBox(height: 20),
                             ElevatedButton(
                               onPressed: _loading ? null : _submit,
                               child: _loading
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.white))
-                                  : const Text('Sign In'),
+                                  ? const SizedBox(width: 18, height: 18,
+                                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                  : Text(s.signIn),
                             ),
                           ],
                         ),
@@ -155,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 10),
                   GestureDetector(
                     onTap: () => context.read<ThemeProvider>().toggle(),
-                    child: Text(dark ? '☀️ Light mode' : '🌙 Dark mode',
+                    child: Text(dark ? '?? Light mode' : '?? Dark mode',
                         style: TextStyle(
                             color: Colors.grey.shade400, fontSize: 12)),
                   ),
