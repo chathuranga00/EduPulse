@@ -1,0 +1,19 @@
+{
+  "name": "edupulse-backend",
+  "version": "1.0.0",
+  "description": "EduPulse backend API server",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "@supabase/supabase-js": "^2.45.4",
+    "openai": "^4.60.0",
+    "@anthropic-ai/sdk": "^0.27.3",
+    "dotenv": "^16.4.5"
+  }
+}
