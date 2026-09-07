@@ -35,7 +35,11 @@ export function clearAuthCookie(res) {
 }
 
 export function getTokenFromCookies(req) {
-  const raw   = req.headers.cookie || ''
+  // Works with both Node.js IncomingMessage (req.headers.cookie)
+  // and Web API Request (req.headers.get('cookie'))
+  const raw = (typeof req.headers.get === 'function')
+    ? (req.headers.get('cookie') || '')
+    : (req.headers?.cookie || '')
   const match = raw.match(/(?:^|;\s*)ep_token=([^;]+)/)
   return match ? match[1] : null
 }

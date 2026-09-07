@@ -1,0 +1,64 @@
+[build]
+  command   = "npm run build"
+  publish   = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Redirect all API calls to Netlify Functions
+[[redirects]]
+  from   = "/api/auth/register"
+  to     = "/.netlify/functions/auth-register"
+  status = 200
+
+[[redirects]]
+  from   = "/api/auth/login"
+  to     = "/.netlify/functions/auth-login"
+  status = 200
+
+[[redirects]]
+  from   = "/api/auth/logout"
+  to     = "/.netlify/functions/auth-logout"
+  status = 200
+
+[[redirects]]
+  from   = "/api/auth/me"
+  to     = "/.netlify/functions/auth-me"
+  status = 200
+
+[[redirects]]
+  from   = "/api/users/profile"
+  to     = "/.netlify/functions/users-profile"
+  status = 200
+
+[[redirects]]
+  from   = "/api/users/password"
+  to     = "/.netlify/functions/users-password"
+  status = 200
+
+[[redirects]]
+  from   = "/api/users/settings"
+  to     = "/.netlify/functions/users-settings"
+  status = 200
+
+[[redirects]]
+  from   = "/api/tutor"
+  to     = "/.netlify/functions/tutor"
+  status = 200
+
+[[redirects]]
+  from   = "/api/analyze-pdf"
+  to     = "/.netlify/functions/analyze-pdf"
+  status = 200
+
+[[redirects]]
+  from   = "/api/generate-quiz"
+  to     = "/.netlify/functions/generate-quiz"
+  status = 200
+
+# SPA fallback — all other routes serve index.html
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
