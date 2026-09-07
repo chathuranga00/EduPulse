@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { subject, topic, questionCount, difficulty } = req.body
+    const { subject, topic, questionCount, difficulty, lang } = req.body
 
     if (!subject || typeof subject !== 'string' || !subject.trim()) {
       return res.status(400).json({ error: 'Subject is required' })
@@ -17,6 +17,7 @@ export default async function handler(req, res) {
       topic:   topic?.trim() || '',
       questionCount: Math.min(Math.max(Number(questionCount) || 10, 5), 30),
       difficulty: difficulty || 'Medium',
+      lang: lang || 'en',
     })
 
     res.status(200).json(quiz)

@@ -8,7 +8,7 @@ Generate a model A/L exam paper in strict JSON format. Questions must match the 
 - Cover a range of topics within the subject
 - Vary cognitive levels: recall, application, analysis
 
-Respond with ONLY valid JSON — no markdown, no commentary. Use this exact structure:
+Respond with ONLY valid JSON — no markdown fences, no commentary, no extra text before or after. Use this exact structure:
 {
   "title": "descriptive paper title",
   "subject": "subject name",
@@ -30,15 +30,40 @@ Respond with ONLY valid JSON — no markdown, no commentary. Use this exact stru
   ]
 }`
 
-function parseQuizJson(raw) {
-  const trimmed = raw.trim()
-  const jsonMatch = trimmed.match(/\{[\s\S]*\}/)
-  if (!jsonMatch) throw new Error('Model did not return valid JSON')
+function getLangInstruction(lang) {
+  if (lang === 'si') return '\n\nIMPORTANT: Write ALL question text, options, explanations, title, and instructions in Sinhala (සිංහල) language only.'
+  if (lang === 'ta') return '\n\nIMPORTANT: Write ALL question text, options, explanations, title, and instructions in Tamil (தமிழ்) language only.'
+  return ''
+}
 
-  const parsed = JSON.parse(jsonMatch[0])
+function extractJson(raw) {
+  if (!raw) return null
+  const start = raw.indexOf('{')
+  if (start === -1) return null
+  let depth = 0
+  for (let i = start; i < raw.length; i++) {
+    if (raw[i] === '{') depth++
+    else if (raw[i] === '}') {
+      depth--
+      if (depth === 0) return raw.slice(start, i + 1)
+    }
+  }
+  return raw.slice(start)
+}
+
+function parseQuizJson(raw) {
+  const jsonStr = extractJson(raw)
+  if (!jsonStr) throw new Error('Model did not return valid JSON')
+
+  let parsed
+  try {
+    parsed = JSON.parse(jsonStr)
+  } catch {
+    throw new Error('Failed to parse quiz JSON from model response')
+  }
 
   if (!parsed.questions || !Array.isArray(parsed.questions) || parsed.questions.length === 0) {
-    throw new Error('Invalid quiz response structure')
+    throw new Error('Invalid quiz response: no questions found')
   }
 
   return {
@@ -48,7 +73,7 @@ function parseQuizJson(raw) {
     instructions: String(parsed.instructions || 'Answer all questions. Each question carries 1 mark.'),
     questions:    parsed.questions.map((q, i) => ({
       no:          Number(q.no ?? i + 1),
-      question:    String(q.question),
+      question:    String(q.question || ''),
       options:     {
         A: String(q.options?.A ?? ''),
         B: String(q.options?.B ?? ''),
@@ -61,32 +86,44 @@ function parseQuizJson(raw) {
   }
 }
 
-export async function generateQuiz({ subject, topic, questionCount = 10, difficulty = 'Medium' }) {
-  const client = getNvidiaClient()
+export async function generateQuiz({ subject, topic, questionCount = 10, difficulty = 'Medium', lang = 'en' }) {
+  // Use minimax-m3 for quiz — faster and better at structured JSON than gpt-oss-20b
+  const { default: OpenAI } = await import('openai')
+  const client = new OpenAI({
+    baseURL: 'https://integrate.api.nvidia.com/v1',
+    apiKey: process.env.NVIDIA_API_KEY,
+  })
 
-  const prompt = `Generate a Sri Lanka A/L model exam paper for the following:
+  const systemPrompt = QUIZ_SYSTEM_PROMPT + getLangInstruction(lang)
+
+  const diffDesc =
+    difficulty === 'Easy' ? 'straightforward recall and basic application' :
+    difficulty === 'Hard' ? 'advanced analysis, evaluation and challenging application' :
+                            'balanced mix of recall and application'
+
+  const prompt = `Generate a Sri Lanka A/L model exam paper:
 Subject: ${subject}
 Topic: ${topic || 'General — cover key syllabus areas'}
 Number of questions: ${questionCount}
-Difficulty: ${difficulty} (${
-    difficulty === 'Easy'   ? 'straightforward recall and basic application' :
-    difficulty === 'Hard'   ? 'advanced analysis, evaluation and challenging application' :
-                              'balanced mix of recall and application'
-  })
+Difficulty: ${difficulty} (${diffDesc})
 
-Produce exactly ${questionCount} MCQ questions in the JSON format specified.`
+Produce exactly ${questionCount} MCQ questions. Output ONLY the JSON object, nothing else.`
 
   const response = await client.chat.completions.create({
-    model:      getModel(),
-    max_tokens: 4096,
+    model:       'minimaxai/minimax-m3',
+    max_tokens:  Math.max(4096, questionCount * 350),
+    temperature: 0.7,
     messages: [
-      { role: 'system', content: QUIZ_SYSTEM_PROMPT },
+      { role: 'system', content: systemPrompt },
       { role: 'user',   content: prompt },
     ],
   })
 
-  const text = response.choices?.[0]?.message?.content
-  if (!text) throw new Error('No response from AI model')
+  const content = response.choices?.[0]?.message?.content
+  const reasoning = response.choices?.[0]?.message?.reasoning_content
+  const raw = (content && content.trim()) ? content : reasoning
 
-  return parseQuizJson(text)
+  if (!raw) throw new Error('No response from AI model')
+
+  return parseQuizJson(raw)
 }

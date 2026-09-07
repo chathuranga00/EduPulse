@@ -7,6 +7,7 @@ import {
 import { sendTutorMessage } from '../lib/api.js'
 import { useToast } from '../components/ui/Toast.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useLang } from '../context/LanguageContext.jsx'
 import { supabase } from '../lib/supabase.js'
 import EmptyState from '../components/ui/EmptyState.jsx'
 
@@ -49,23 +50,23 @@ function detectSubject(messages) {
 }
 
 // Welcome message per user
-function makeWelcome(name) {
+function makeWelcome(name, t) {
   return {
     id: 'welcome',
     role: 'assistant',
-    content: `Hi ${name || 'there'}! I'm your AI tutor. Ask me anything about your courses — I can explain concepts, help with homework, or quiz you on topics.`,
+    content: t.tutorWelcome(name),
     created_at: new Date().toISOString(),
   }
 }
 
 // ── Chat history sidebar ───────────────────────────────────────────────────────
-function ChatHistoryPanel({ chats, activeChatId, onSelectChat, onNewChat, onDeleteChat, loading }) {
+function ChatHistoryPanel({ chats, activeChatId, onSelectChat, onNewChat, onDeleteChat, loading, t }) {
   return (
     <aside className="hidden w-64 shrink-0 flex-col border-r border-indigo-100/80 bg-white dark:border-gray-800 dark:bg-gray-900 md:flex">
       <div className="border-b border-indigo-100/80 p-4 dark:border-gray-800">
         <button type="button" onClick={onNewChat}
           className="ep-btn-secondary flex w-full justify-center border-dashed py-2.5">
-          <Plus className="h-4 w-4" />New Chat
+          <Plus className="h-4 w-4" />{t.newChat}
         </button>
       </div>
       <div className="flex-1 overflow-y-auto p-3">
@@ -74,7 +75,7 @@ function ChatHistoryPanel({ chats, activeChatId, onSelectChat, onNewChat, onDele
         ) : chats.length === 0 ? (
           <div className="px-2 py-6 text-center">
             <MessageSquare className="mx-auto mb-2 h-8 w-8 text-gray-300 dark:text-gray-700" />
-            <p className="text-xs text-gray-400">No conversations yet</p>
+            <p className="text-xs text-gray-400">{t.noConversations}</p>
           </div>
         ) : (
           <ul className="space-y-1">
@@ -112,7 +113,7 @@ function AIMessage({ content }) {
           <Sparkles className="h-3.5 w-3.5 text-primary" />
         </div>
         <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-          EduPulse AI · Tutor
+          EduPulse · Tutor
         </span>
       </div>
       <div className="rounded-2xl border border-indigo-50 bg-white p-4 shadow-sm shadow-indigo-100/30 dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
@@ -143,7 +144,7 @@ function Flashcard({ question, answer }) {
 }
 
 // ── Dynamic context panel ─────────────────────────────────────────────────────
-function ContextPanel({ messages, subject }) {
+function ContextPanel({ messages, subject, t }) {
   const keyTerms   = useMemo(() => extractKeyTerms(messages), [messages])
   const msgCount   = messages.filter((m) => m.role === 'user').length
   const depth      = Math.min(100, msgCount * 12)
@@ -175,10 +176,10 @@ function ContextPanel({ messages, subject }) {
       {/* Key Terms — extracted live from conversation */}
       <section className="mb-6">
         <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-gray-900 dark:text-white">
-          <Hash className="h-4 w-4 text-primary" />Key Terms
+          <Hash className="h-4 w-4 text-primary" />{t.keyTerms}
         </h3>
         {keyTerms.length === 0 ? (
-          <p className="text-xs text-gray-400">Terms appear as you chat</p>
+          <p className="text-xs text-gray-400">{t.termsAppear}</p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {keyTerms.map((term) => (
@@ -197,7 +198,7 @@ function ContextPanel({ messages, subject }) {
       {/* Quick Notes */}
       <section className="mb-6">
         <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-gray-900 dark:text-white">
-          <Lightbulb className="h-4 w-4 text-primary" />Quick Notes
+          <Lightbulb className="h-4 w-4 text-primary" />{t.quickNotes}
         </h3>
         <ul className="mb-3 space-y-2">
           {notes.map((n, i) => (
@@ -209,10 +210,10 @@ function ContextPanel({ messages, subject }) {
               </button>
             </li>
           ))}
-          {notes.length === 0 && <li className="text-xs text-gray-400">No notes yet</li>}
+          {notes.length === 0 && <li className="text-xs text-gray-400">{t.noNotes}</li>}
         </ul>
         <form onSubmit={addNote} className="flex gap-1.5">
-          <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Add a note…"
+          <input value={note} onChange={(e) => setNote(e.target.value)} placeholder={t.addNote}
             className="flex-1 rounded-xl border border-gray-200 bg-lavender-light px-2.5 py-1.5 text-xs focus:border-primary focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" />
           <button type="submit" disabled={!note.trim()}
             className="flex h-7 w-7 items-center justify-center rounded-xl bg-primary text-white disabled:opacity-40 hover:bg-primary-hover">
@@ -225,7 +226,7 @@ function ContextPanel({ messages, subject }) {
       {lastAI && (
         <section className="mb-6">
           <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-gray-900 dark:text-white">
-            <RotateCcw className="h-4 w-4 text-primary" />Flashcard
+            <RotateCcw className="h-4 w-4 text-primary" />{t.flashcard}
           </h3>
           <Flashcard
             question={subject ? `What is a key concept in ${subject}?` : 'What did you just learn?'}
@@ -238,7 +239,7 @@ function ContextPanel({ messages, subject }) {
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h3 className="flex items-center gap-1.5 text-sm font-semibold text-gray-900 dark:text-white">
-            <TrendingUp className="h-4 w-4 text-primary" />Session Depth
+            <TrendingUp className="h-4 w-4 text-primary" />{t.sessionDepth}
           </h3>
           <span className="text-sm font-bold text-primary">{depth}%</span>
         </div>
@@ -247,7 +248,7 @@ function ContextPanel({ messages, subject }) {
             style={{ width: `${depth}%` }} />
         </div>
         <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-          {msgCount === 0 ? 'Start chatting to build depth' : `${msgCount} question${msgCount !== 1 ? 's' : ''} asked`}
+          {msgCount === 0 ? t.startChatting : t.questionAsked(msgCount)}
         </p>
       </section>
     </aside>
@@ -255,7 +256,7 @@ function ContextPanel({ messages, subject }) {
 }
 
 // ── Conversation panel ────────────────────────────────────────────────────────
-function ConversationPanel({ messages, input, onInputChange, onSend, isLoading, error, chatTitle }) {
+function ConversationPanel({ messages, input, onInputChange, onSend, isLoading, error, chatTitle, t }) {
   const bottomRef = useRef(null)
 
   useEffect(() => {
@@ -289,7 +290,7 @@ function ConversationPanel({ messages, input, onInputChange, onSend, isLoading, 
           <div className="flex justify-start">
             <div className="flex items-center gap-2 rounded-2xl border border-indigo-50 bg-white px-4 py-3 shadow-sm dark:border-gray-800 dark:bg-gray-900">
               <Loader2 className="h-4 w-4 animate-spin text-primary" />
-              <span className="text-sm text-gray-500 dark:text-gray-400">EduPulse AI is thinking…</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">{t.tutorThinking}</span>
             </div>
           </div>
         )}
@@ -306,18 +307,18 @@ function ConversationPanel({ messages, input, onInputChange, onSend, isLoading, 
         className="border-t border-indigo-100/80 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
         <div className="rounded-2xl border border-gray-200 bg-lavender-light p-3 dark:border-gray-700 dark:bg-gray-800">
           <input type="text" value={input} onChange={(e) => onInputChange(e.target.value)}
-            placeholder="Ask about any topic — chemistry, math, history..."
+            placeholder={t.tutorPlaceholder}
             disabled={isLoading}
             className="w-full bg-transparent px-1 py-1 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none disabled:opacity-60 dark:text-gray-100" />
           <div className="mt-3 flex items-center justify-between gap-3">
             <div className="flex gap-2">
               <button type="button" disabled={isLoading}
                 className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:border-primary hover:text-primary disabled:opacity-50 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-400">
-                <Paperclip className="h-3.5 w-3.5" />Attach PDF/Docs
+                <Paperclip className="h-3.5 w-3.5" />{t.attachPdf}
               </button>
               <button type="button" disabled={isLoading}
                 className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:border-primary hover:text-primary disabled:opacity-50 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-400">
-                <Mic className="h-3.5 w-3.5" />Voice
+                <Mic className="h-3.5 w-3.5" />{t.voice}
               </button>
             </div>
             <button type="submit" disabled={isLoading || !input.trim()}
@@ -336,6 +337,7 @@ function ConversationPanel({ messages, input, onInputChange, onSend, isLoading, 
 export default function AITutor() {
   const toast                         = useToast()
   const { user }                      = useAuth()
+  const { t, lang }                   = useLang()
   const [chats, setChats]             = useState([])
   const [chatsLoading, setChatsLoading] = useState(true)
   const [activeChatId, setActiveChatId] = useState(null)
@@ -348,7 +350,7 @@ export default function AITutor() {
 
   const activeChat = chats.find((c) => c.id === activeChatId)
   const displayMsgs = messages.length === 0
-    ? [makeWelcome(user?.name)]
+    ? [makeWelcome(user?.name, t)]
     : messages
 
   // ── Load user's chats ──────────────────────────────────────────────────────
@@ -439,7 +441,12 @@ export default function AITutor() {
         .select()
         .single()
 
-      if (chatErr) { toast.error('Could not create chat'); setIsLoading(false); return }
+      if (chatErr) {
+        console.error('Create chat error:', chatErr)
+        toast.error(chatErr.message || 'Could not create chat')
+        setIsLoading(false)
+        return
+      }
       chatId = newChat.id
       setActiveChatId(chatId)
     }
@@ -457,7 +464,7 @@ export default function AITutor() {
     const history = messages.map(({ role, content }) => ({ role, content }))
 
     try {
-      const text = await sendTutorMessage(userContent, history)
+      const text = await sendTutorMessage(userContent, history, lang)
 
       // Save AI response
       const { data: aiMsg } = await supabase
@@ -515,6 +522,7 @@ export default function AITutor() {
         onNewChat={handleNewChat}
         onDeleteChat={handleDeleteChat}
         loading={chatsLoading}
+        t={t}
       />
       {msgsLoading ? (
         <div className="flex flex-1 items-center justify-center">
@@ -529,9 +537,10 @@ export default function AITutor() {
           isLoading={isLoading}
           error={error}
           chatTitle={activeChat?.title}
+          t={t}
         />
       )}
-      <ContextPanel messages={displayMsgs} subject={subject} />
+      <ContextPanel messages={displayMsgs} subject={subject} t={t} />
     </div>
   )
 }

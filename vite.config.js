@@ -47,11 +47,11 @@ function apiRoutesPlugin() {
         if (req.method === 'POST' && url === '/api/tutor') {
           try {
             const body = await readJsonBody(req)
-            const { message, history } = body
+            const { message, history, lang } = body
             if (!message || typeof message !== 'string' || !message.trim()) {
               return sendJson(res, 400, { error: 'Message is required' })
             }
-            const text = await chatWithTutor(message.trim(), history || [])
+            const text = await chatWithTutor(message.trim(), history || [], lang || 'en')
             return sendJson(res, 200, { text })
           } catch (err) {
             console.error('Tutor API error:', err)
@@ -79,7 +79,7 @@ function apiRoutesPlugin() {
         if (req.method === 'POST' && url === '/api/generate-quiz') {
           try {
             const body = await readJsonBody(req)
-            const { subject, topic, questionCount, difficulty } = body
+            const { subject, topic, questionCount, difficulty, lang } = body
             if (!subject || typeof subject !== 'string' || !subject.trim()) {
               return sendJson(res, 400, { error: 'Subject is required' })
             }
@@ -88,6 +88,7 @@ function apiRoutesPlugin() {
               topic:         topic?.trim() || '',
               questionCount: Math.min(Math.max(Number(questionCount) || 10, 5), 30),
               difficulty:    difficulty || 'Medium',
+              lang:          lang || 'en',
             })
             return sendJson(res, 200, quiz)
           } catch (err) {

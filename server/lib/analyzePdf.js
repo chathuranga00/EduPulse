@@ -65,6 +65,7 @@ export async function analyzeDocument(text, fileName = 'document') {
   })
 
   const responseText = response.choices?.[0]?.message?.content
+    || response.choices?.[0]?.message?.reasoning_content
   if (!responseText) {
     throw new Error('No text response from NVIDIA NIM')
   }

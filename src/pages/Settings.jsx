@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react'
 import {
   User, Bell, Shield, Palette, Moon, Lock,
   Loader2, ClipboardCheck, MessageSquare, ListTodo,
-  FileText, Wifi, LogOut,
+  FileText, Wifi, LogOut, Globe,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import PageHeader from '../components/ui/PageHeader.jsx'
 import { useToast } from '../components/ui/Toast.jsx'
 import { useTheme } from '../context/ThemeContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useLang, LANGUAGES } from '../context/LanguageContext.jsx'
 import { supabase } from '../lib/supabase.js'
 
 // ── Toggle switch ─────────────────────────────────────────────────────────────
@@ -45,6 +46,7 @@ export default function Settings() {
   const toast                        = useToast()
   const navigate                     = useNavigate()
   const { darkMode, toggleDarkMode } = useTheme()
+  const { lang, switchLang, t }      = useLang()
   const { user, settings, initials, updateProfile, changePassword, updateSettings, logout } = useAuth()
 
   // Profile form — sync when user changes (real-time update from another tab)
@@ -337,17 +339,46 @@ export default function Settings() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-lavender dark:bg-gray-800">
               <Palette className="h-5 w-5 text-primary" />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Appearance</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t.appearance}</h2>
           </div>
+
+          {/* Dark mode */}
           <div className="flex items-center justify-between gap-4 rounded-xl p-2">
             <div className="flex items-center gap-3">
               <Moon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Dark mode</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{t.darkMode}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Switch between light and dark themes</p>
               </div>
             </div>
             <Toggle enabled={darkMode} onChange={toggleDarkMode} label="Dark mode" />
+          </div>
+
+          {/* Language */}
+          <div className="mt-3 flex items-center justify-between gap-4 rounded-xl p-2">
+            <div className="flex items-center gap-3">
+              <Globe className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+              <div>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{t.language}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t.languageDesc}</p>
+              </div>
+            </div>
+            <div className="flex gap-1.5">
+              {Object.values(LANGUAGES).map((l) => (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => switchLang(l.code)}
+                  className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition ${
+                    lang === l.code
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'bg-lavender text-gray-600 hover:bg-primary/10 dark:bg-gray-800 dark:text-gray-300'
+                  }`}
+                >
+                  {l.flag} {l.nativeLabel}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -361,7 +392,7 @@ export default function Settings() {
           </div>
           <div className="flex items-center justify-between gap-4 rounded-xl border border-red-100 bg-red-50/50 p-4 dark:border-red-900/30 dark:bg-red-950/20">
             <div>
-              <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Sign out of EduPulse AI</p>
+              <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Sign out of EduPulse</p>
               <p className="text-xs text-gray-500 dark:text-gray-400">You'll need to sign in again to access your account</p>
             </div>
             <button type="button" onClick={handleLogout}

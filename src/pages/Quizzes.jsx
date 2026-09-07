@@ -10,6 +10,7 @@ import { useToast } from '../components/ui/Toast.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { supabase } from '../lib/supabase.js'
 import { generateQuizPaper } from '../lib/api.js'
+import { useLang } from '../context/LanguageContext.jsx'
 
 // ── Subject catalogue ────────────────────────────────────────────────────────
 const STREAMS = [
@@ -354,6 +355,9 @@ function QuizLoading({ quiz }) {
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           Preparing {quiz.questions} {quiz.subject} questions at {quiz.difficulty} level
         </p>
+        <p className="mt-3 text-xs text-gray-400 dark:text-gray-500">
+          This usually takes 10–20 seconds. Please wait…
+        </p>
       </div>
     </div>
   )
@@ -579,6 +583,7 @@ const difficulties = ['All', 'Easy', 'Medium', 'Hard']
 export default function Quizzes() {
   const toast                                   = useToast()
   const { user }                                = useAuth()
+  const { lang }                                = useLang()
   const [subjectFilter, setSubjectFilter]       = useState('All')
   const [streamFilter, setStreamFilter]         = useState('All')
   const [difficultyFilter, setDifficultyFilter] = useState('All')
@@ -681,15 +686,18 @@ export default function Quizzes() {
       const result = await generateQuizPaper({
         subject: quiz.subject, topic: quiz.title,
         questionCount: quiz.questions, difficulty: quiz.difficulty,
+        lang,
       })
       setPaper(result)
     } catch (err) {
       toast.error(err.message || 'Failed to generate quiz paper')
+      // Keep activeQuiz so user sees error, reset loading
+      setLoadingQuiz(false)
       setActiveQuiz(null)
     } finally {
       setLoadingQuiz(false)
     }
-  }, [toast])
+  }, [toast, lang])
 
   const handleFinish = useCallback(() => {
     setPaper(null)

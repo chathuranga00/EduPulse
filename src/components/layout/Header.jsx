@@ -1,13 +1,63 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Search, Bell, Moon, Sun, Sparkles, Menu, Settings, LogOut } from 'lucide-react'
+import { Search, Moon, Sun, Sparkles, Menu, Settings, LogOut, Globe } from 'lucide-react'
 import { useTheme } from '../../context/ThemeContext.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
+import { useLang, LANGUAGES } from '../../context/LanguageContext.jsx'
+import NotificationBell from './NotificationBell.jsx'
 import logo from '../../assets/logo.png'
 
+// ── Language switcher dropdown ────────────────────────────────────────────────
+function LanguageSwitcher() {
+  const { lang, switchLang, languages } = useLang()
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', h)
+    return () => document.removeEventListener('mousedown', h)
+  }, [])
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-label="Switch language"
+        className="flex h-10 items-center gap-1.5 rounded-xl px-2 text-gray-600 transition hover:bg-lavender dark:text-gray-300 dark:hover:bg-gray-800"
+      >
+        <Globe className="h-4 w-4" />
+        <span className="hidden text-xs font-semibold sm:inline">{languages[lang]?.nativeLabel}</span>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-12 z-50 w-40 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900">
+          {Object.values(languages).map((l) => (
+            <button
+              key={l.code}
+              type="button"
+              onClick={() => { switchLang(l.code); setOpen(false) }}
+              className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-lavender dark:hover:bg-gray-800 ${
+                lang === l.code ? 'font-semibold text-primary' : 'text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              <span>{l.flag}</span>
+              <span>{l.nativeLabel}</span>
+              {lang === l.code && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
 export default function Header({ onMenuClick }) {
   const { darkMode, toggleDarkMode }    = useTheme()
   const { user, initials, logout }      = useAuth()
+  const { t }                           = useLang()
   const navigate                        = useNavigate()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropRef = useRef(null)
@@ -40,27 +90,28 @@ export default function Header({ onMenuClick }) {
       </div>
 
       <nav className="hidden items-center gap-6 md:flex">
-        <a href="#library" className="ep-btn-ghost px-0 py-0 hover:bg-transparent">My Library</a>
-        <a href="#classes" className="ep-btn-ghost px-0 py-0 hover:bg-transparent">Live Classes</a>
+        <Link to="/library" className="ep-btn-ghost px-0 py-0 hover:bg-transparent">{t.myLibrary}</Link>
+        <a href="#classes" className="ep-btn-ghost px-0 py-0 hover:bg-transparent">{t.liveClasses}</a>
       </nav>
 
-      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+      <div className="flex shrink-0 items-center gap-1 sm:gap-2">
         {/* Ask AI button — desktop */}
         <Link to="/ai-tutor" className="ep-btn-primary hidden gap-2 px-3 py-2 sm:inline-flex">
           <img src={logo} alt="" className="h-4 w-4 rounded object-cover" />
-          <span className="hidden md:inline">Ask AI</span>
+          <span className="hidden md:inline">{t.askAI}</span>
         </Link>
         {/* Ask AI button — mobile */}
-        <Link to="/ai-tutor" className="ep-btn-primary inline-flex h-10 w-10 overflow-hidden p-0 sm:hidden" aria-label="Ask AI">
-          <img src={logo} alt="Ask AI" className="h-full w-full object-cover" />
+        <Link to="/ai-tutor" className="ep-btn-primary inline-flex h-10 w-10 overflow-hidden p-0 sm:hidden" aria-label={t.askAI}>
+          <img src={logo} alt={t.askAI} className="h-full w-full object-cover" />
         </Link>
 
-        <button type="button" aria-label="Notifications"
-          className="relative flex h-10 w-10 items-center justify-center rounded-xl text-gray-600 transition-all duration-200 hover:bg-lavender dark:text-gray-300 dark:hover:bg-gray-800">
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900" />
-        </button>
+        {/* Real notification bell */}
+        <NotificationBell />
 
+        {/* Language switcher */}
+        <LanguageSwitcher />
+
+        {/* Dark mode toggle */}
         <button type="button" aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
           onClick={toggleDarkMode}
           className="flex h-10 w-10 items-center justify-center rounded-xl text-gray-600 transition-all duration-200 hover:bg-lavender dark:text-gray-300 dark:hover:bg-gray-800">
@@ -86,11 +137,11 @@ export default function Header({ onMenuClick }) {
               <div className="p-1.5">
                 <Link to="/settings" onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-gray-700 transition hover:bg-lavender dark:text-gray-300 dark:hover:bg-gray-800">
-                  <Settings className="h-4 w-4" /> Settings
+                  <Settings className="h-4 w-4" /> {t.settings}
                 </Link>
                 <button type="button" onClick={handleLogout}
                   className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-red-500 transition hover:bg-red-50 dark:hover:bg-red-900/20">
-                  <LogOut className="h-4 w-4" /> Sign Out
+                  <LogOut className="h-4 w-4" /> {t.signOut}
                 </button>
               </div>
             </div>

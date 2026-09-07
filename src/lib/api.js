@@ -1,8 +1,10 @@
-export async function sendTutorMessage(message, history = []) {
-  const res = await fetch('/api/tutor', {
+const BASE = import.meta.env.VITE_API_BASE_URL || ''
+
+export async function sendTutorMessage(message, history = [], lang = 'en') {
+  const res = await fetch(`${BASE}/api/tutor`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, history }),
+    body: JSON.stringify({ message, history, lang }),
   })
 
   const data = await res.json().catch(() => ({}))
@@ -12,11 +14,11 @@ export async function sendTutorMessage(message, history = []) {
   return data.text
 }
 
-export async function analyzeDocumentText(text, fileName) {
-  const res = await fetch('/api/analyze-pdf', {
+export async function analyzeDocumentText(text, fileName, lang = 'en') {
+  const res = await fetch(`${BASE}/api/analyze-pdf`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, fileName }),
+    body: JSON.stringify({ text, fileName, lang }),
   })
 
   const data = await res.json().catch(() => ({}))
@@ -26,12 +28,11 @@ export async function analyzeDocumentText(text, fileName) {
   return data
 }
 
-
-export async function generateQuizPaper({ subject, topic, questionCount, difficulty }) {
-  const res = await fetch('/api/generate-quiz', {
+export async function generateQuizPaper({ subject, topic, questionCount, difficulty, lang = 'en' }) {
+  const res = await fetch(`${BASE}/api/generate-quiz`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ subject, topic, questionCount, difficulty }),
+    body: JSON.stringify({ subject, topic, questionCount, difficulty, lang }),
   })
 
   const data = await res.json().catch(() => ({}))

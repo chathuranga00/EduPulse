@@ -48,10 +48,10 @@ export default function Signup() {
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl overflow-hidden shadow-lg shadow-indigo-200/50 dark:shadow-none">
-            <img src={logo} alt="EduPulse AI" className="h-full w-full object-cover" />
+            <img src={logo} alt="EduPulse" className="h-full w-full object-cover" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">EduPulse AI</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">EduPulse</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">Create your account</p>
           </div>
         </div>

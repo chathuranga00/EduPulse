@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, MessageSquare, FileText, CalendarDays,
-  ClipboardList, Users, Settings, HelpCircle,
+  ClipboardList, Users, Settings, BookMarked,
   X, LogOut,
 } from 'lucide-react'
 import logo from '../../assets/logo.png'
@@ -10,6 +10,7 @@ import { useAuth } from '../../context/AuthContext.jsx'
 const navItems = [
   { to: '/',              label: 'Dashboard',     icon: LayoutDashboard, end: true },
   { to: '/ai-tutor',      label: 'AI Tutor',      icon: MessageSquare },
+  { to: '/library',       label: 'My Library',    icon: BookMarked },
   { to: '/pdf-analysis',  label: 'PDF Analysis',  icon: FileText },
   { to: '/study-planner', label: 'Study Planner', icon: CalendarDays },
   { to: '/quizzes',       label: 'Quizzes',       icon: ClipboardList },
@@ -37,10 +38,10 @@ export default function Sidebar({ open, onClose }) {
         <div className="mb-8 flex items-start justify-between px-2">
           <div className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden shadow-md shadow-indigo-200/50 transition-transform duration-200 hover:scale-105 dark:shadow-none">
-              <img src={logo} alt="EduPulse AI" className="h-full w-full object-cover" />
+              <img src={logo} alt="EduPulse" className="h-full w-full object-cover" />
             </div>
             <div>
-              <h1 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">EduPulse AI</h1>
+              <h1 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">EduPulse</h1>
               <p className="text-xs font-medium text-primary">{user?.plan === 'plus' ? 'Plus Plan' : 'Student Plan'}</p>
             </div>
           </div>
@@ -73,18 +74,6 @@ export default function Sidebar({ open, onClose }) {
 
         {/* Bottom actions */}
         <div className="mt-6 space-y-2">
-          <button
-            type="button"
-            className="w-full rounded-2xl bg-gradient-to-r from-primary to-violet-500 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-indigo-200/50 transition-all duration-200 hover:from-primary-hover hover:to-violet-600 hover:shadow-lg active:scale-[0.98] dark:shadow-none"
-          >
-            Upgrade to Plus
-          </button>
-
-          <a href="#help" className="ep-btn-ghost px-3">
-            <HelpCircle className="h-4 w-4" />
-            Help Center
-          </a>
-
           <button type="button" onClick={handleLogout} className="ep-btn-ghost w-full px-3 text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20">
             <LogOut className="h-4 w-4" />
             Sign Out

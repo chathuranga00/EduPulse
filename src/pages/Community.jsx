@@ -306,7 +306,8 @@ export default function Community() {
       content,
     })
     if (error) {
-      toast.error('Failed to post. Please try again.')
+      console.error('Post error:', error)
+      toast.error(error.message || 'Failed to post. Please try again.')
     } else {
       toast.success('Post published!')
       setModalOpen(false)

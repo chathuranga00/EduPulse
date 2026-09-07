@@ -6,13 +6,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message, history } = req.body
+    const { message, history, lang } = req.body
 
     if (!message || typeof message !== 'string' || !message.trim()) {
       return res.status(400).json({ error: 'Message is required' })
     }
 
-    const text = await chatWithTutor(message.trim(), history || [])
+    const text = await chatWithTutor(message.trim(), history || [], lang || 'en')
     res.status(200).json({ text })
   } catch (err) {
     console.error('Tutor API error:', err)
