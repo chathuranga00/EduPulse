@@ -1,7 +1,7 @@
-﻿import "package:flutter/material.dart";
-import "package:flutter_markdown/flutter_markdown.dart";
-import "../../core/api_service.dart";
-import "../../core/theme.dart";
+import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import '../../core/api_service.dart';
+import '../../core/theme.dart';
 
 class TutorScreen extends StatefulWidget {
   const TutorScreen({super.key});
@@ -25,7 +25,13 @@ class _TutorScreenState extends State<TutorScreen> {
       final reply = await ApiService.chat(message: text, history: history);
       if (mounted) setState(() => _msgs.add({"role": "assistant", "content": reply}));
     } catch (e) {
-      if (mounted) setState(() => _msgs.add({"role": "assistant", "content": "Error: ${e.toString().replaceFirst("Exception: ", "")}"}));
+      final errMsg = e.toString().replaceFirst('Exception: ', '');
+      final friendlyMsg = errMsg.contains('TimeoutException')
+          ? '⏱️ The AI is taking too long. Please try again.'
+          : errMsg.contains('Connection refused') || errMsg.contains('SocketException')
+              ? '🔌 Cannot connect to server. Make sure the backend is running.'
+              : '⚠️ $errMsg';
+      if (mounted) setState(() => _msgs.add({"role": "assistant", "content": friendlyMsg}));
     } finally { if (mounted) setState(() => _loading = false); _down(); }
   }
 
@@ -36,7 +42,14 @@ class _TutorScreenState extends State<TutorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("AI Tutor", style: TextStyle(fontWeight: FontWeight.bold))),
+      appBar: AppBar(
+        title: Row(children: [
+          ClipRRect(borderRadius: BorderRadius.circular(8),
+            child: Image.asset('assets/images/logo.png', width: 28, height: 28, fit: BoxFit.cover)),
+          const SizedBox(width: 8),
+          const Text('AI Tutor', style: TextStyle(fontWeight: FontWeight.bold)),
+        ]),
+      ),
       body: Column(children: [
         Expanded(child: _msgs.isEmpty ? _empty() : ListView.builder(
           controller: _scroll, padding: const EdgeInsets.all(16),

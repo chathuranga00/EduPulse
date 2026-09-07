@@ -13,7 +13,7 @@ export async function nvidiaChat(messages, model) {
     model:       model || process.env.NVIDIA_MODEL || 'meta/llama-3.2-11b-vision-instruct',
     messages,
     temperature: 0.7,
-    max_tokens:  2048,
+    max_tokens:  4096,  // Increased — 2048 was cutting off JSON for 20 questions
   })
   return completion.choices[0]?.message?.content || ''
 }

@@ -1,4 +1,5 @@
-﻿import 'dart:convert';
+﻿import 'dart:async';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'constants.dart';
@@ -63,25 +64,33 @@ class ApiService {
   }
 
   static Future<String> chat({required String message, required List<Map<String, String>> history}) async {
-    final res = await http.post(Uri.parse('$kApiBaseUrl/api/tutor'),
-        headers: await _headers(), body: jsonEncode({'message': message, 'history': history}));
+    final res = await http.post(
+      Uri.parse('$kApiBaseUrl/api/tutor'),
+      headers: await _headers(),
+      body: jsonEncode({'message': message, 'history': history}),
+    ).timeout(const Duration(seconds: 60)); // AI can take up to 60s
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     if (res.statusCode == 200) return data['text'] as String;
     throw Exception(data['error'] ?? 'Tutor failed');
   }
 
   static Future<Map<String, dynamic>> analyzePdf({required String text, required String fileName}) async {
-    final res = await http.post(Uri.parse('$kApiBaseUrl/api/analyze-pdf'),
-        headers: await _headers(), body: jsonEncode({'text': text, 'fileName': fileName}));
+    final res = await http.post(
+      Uri.parse('$kApiBaseUrl/api/analyze-pdf'),
+      headers: await _headers(),
+      body: jsonEncode({'text': text, 'fileName': fileName}),
+    ).timeout(const Duration(seconds: 60));
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     if (res.statusCode == 200) return data;
     throw Exception(data['error'] ?? 'Analysis failed');
   }
 
   static Future<Map<String, dynamic>> generateQuiz({required String subject, required String topic, required int questionCount, required String difficulty}) async {
-    final res = await http.post(Uri.parse('$kApiBaseUrl/api/generate-quiz'),
-        headers: await _headers(),
-        body: jsonEncode({'subject': subject, 'topic': topic, 'questionCount': questionCount, 'difficulty': difficulty}));
+    final res = await http.post(
+      Uri.parse('$kApiBaseUrl/api/generate-quiz'),
+      headers: await _headers(),
+      body: jsonEncode({'subject': subject, 'topic': topic, 'questionCount': questionCount, 'difficulty': difficulty}),
+    ).timeout(const Duration(seconds: 90)); // Quiz generation can take longer
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     if (res.statusCode == 200) return data;
     throw Exception(data['error'] ?? 'Quiz generation failed');
