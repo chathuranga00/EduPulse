@@ -4,7 +4,19 @@
   functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+
+[functions."generate-quiz"]
+  timeout = 60
+
+[functions."tutor"]
+  timeout = 30
+
+[functions."analyze-pdf"]
+  timeout = 60
 
 # Redirect all API calls to Netlify Functions
 [[redirects]]
