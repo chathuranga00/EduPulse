@@ -1,14 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Supabase publishable (anon) key — safe to use in the browser
-// Real-time subscriptions use this client
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Hardcoded for reliability — anon key is safe to expose in browser
+const SUPABASE_URL     = import.meta.env.VITE_SUPABASE_URL     || 'https://suqivyjlptyelgrysmvo.supabase.co'
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1cWl2eWpscHR5ZWxncnlzbXZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MTI0NjAsImV4cCI6MjEwNDE4ODQ2MH0._yb5YA8r-FH7_sBdlIBQNdT1IuU-_Bvc2Jf7TinS3Zk'
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.warn(
-    'Supabase env vars missing. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env'
-  )
-}
-
-export const supabase = createClient(SUPABASE_URL || '', SUPABASE_ANON_KEY || '')
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
