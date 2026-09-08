@@ -63,12 +63,17 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Quizzes", style: TextStyle(fontWeight: FontWeight.bold)),
-        actions: [IconButton(icon: const Icon(Icons.auto_awesome, color: kPrimary), onPressed: _showGenerate)],
+        title: Row(children: [
+          ClipRRect(borderRadius: BorderRadius.circular(8),
+            child: Image.asset('assets/images/logo.png', width: 28, height: 28, fit: BoxFit.cover)),
+          const SizedBox(width: 8),
+          const Text('Quizzes', style: TextStyle(fontWeight: FontWeight.bold)),
+        ]),
+        actions: [IconButton(icon: const Icon(Icons.auto_awesome, color: kPrimary), onPressed: _showGenerate, tooltip: 'AI Generate')],
         bottom: PreferredSize(preferredSize: const Size.fromHeight(52),
           child: Padding(padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: TextField(onChanged: (v) => setState(() => _search = v),
-              decoration: InputDecoration(hintText: "Search quizzes...", prefixIcon: const Icon(Icons.search, size: 18), isDense: true,
+              decoration: InputDecoration(hintText: 'Search quizzes...', prefixIcon: const Icon(Icons.search, size: 18), isDense: true,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
                 enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide(color: Colors.grey.shade300)))))),
       ),

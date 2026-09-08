@@ -1,4 +1,4 @@
-﻿import "package:flutter/material.dart";
+import "package:flutter/material.dart";
 import "package:file_picker/file_picker.dart";
 import "package:flutter_markdown/flutter_markdown.dart";
 import "../../core/api_service.dart";
@@ -43,7 +43,14 @@ class _PdfScreenState extends State<PdfScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("PDF Analysis", style: TextStyle(fontWeight: FontWeight.bold))),
+      appBar: AppBar(
+        title: Row(children: [
+          ClipRRect(borderRadius: BorderRadius.circular(8),
+            child: Image.asset('assets/images/logo.png', width: 28, height: 28, fit: BoxFit.cover)),
+          const SizedBox(width: 8),
+          const Text('PDF Analysis', style: TextStyle(fontWeight: FontWeight.bold)),
+        ]),
+      ),
       body: ListView(padding: const EdgeInsets.all(16), children: [
         InkWell(onTap: _picking ? null : _pick, borderRadius: BorderRadius.circular(16),
           child: Container(
@@ -96,3 +103,4 @@ class _PdfScreenState extends State<PdfScreen> {
     );
   }
 }
+

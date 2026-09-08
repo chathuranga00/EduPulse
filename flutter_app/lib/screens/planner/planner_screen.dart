@@ -92,7 +92,13 @@ class _PlannerScreenState extends State<PlannerScreen> with SingleTickerProvider
     final pct     = total == 0 ? 0.0 : done / total;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Study Planner", style: TextStyle(fontWeight: FontWeight.bold)),
+      appBar: AppBar(
+        title: Row(children: [
+          ClipRRect(borderRadius: BorderRadius.circular(8),
+            child: Image.asset('assets/images/logo.png', width: 28, height: 28, fit: BoxFit.cover)),
+          const SizedBox(width: 8),
+          const Text('Study Planner', style: TextStyle(fontWeight: FontWeight.bold)),
+        ]),
         bottom: TabBar(controller: _tabs, labelColor: kPrimary, indicatorColor: kPrimary,
           tabs: [Tab(text: "Tasks ($pending pending)"), const Tab(text: "Events")])),
       floatingActionButton: FloatingActionButton.extended(onPressed: _addTask, backgroundColor: kPrimary,

@@ -1,4 +1,4 @@
-﻿import "package:flutter/material.dart";
+import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 import "../../core/theme.dart";
@@ -91,15 +91,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Row(children: [
-          const Text("Community", style: TextStyle(fontWeight: FontWeight.bold)),
+          ClipRRect(borderRadius: BorderRadius.circular(8),
+            child: Image.asset('assets/images/logo.png', width: 28, height: 28, fit: BoxFit.cover)),
           const SizedBox(width: 8),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(color: _live ? Colors.green.shade100 : Colors.grey.shade100, borderRadius: BorderRadius.circular(20)),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Container(width: 6, height: 6, decoration: BoxDecoration(shape: BoxShape.circle, color: _live ? Colors.green : Colors.grey)),
-              const SizedBox(width: 4),
-              Text(_live ? "Live" : "Connecting", style: TextStyle(fontSize: 10, color: _live ? Colors.green.shade700 : Colors.grey.shade500)),
-            ])),
+          const Text('Community', style: TextStyle(fontWeight: FontWeight.bold)),
         ]),
         actions: [IconButton(icon: const Icon(Icons.add_circle_outline, color: kPrimary), onPressed: _newPost)],
       ),
@@ -150,3 +145,4 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 }
+
