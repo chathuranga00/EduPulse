@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EduPulseAI</string>
+    <string name="title_activity_main">EduPulseAI</string>
+    <string name="package_name">com.edupulseai.app</string>
+    <string name="custom_url_scheme">com.edupulseai.app</string>
+</resources>
